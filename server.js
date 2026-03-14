@@ -52,10 +52,11 @@ app.post("/study", async (req, res) => {
 
     } catch (error) {
 
-        console.error(error);
+        console.error("AI Error:", error.response?.data || error.message || error);
 
         res.status(500).json({
-            error: "AI processing failed"
+            error: "AI processing failed",
+            details: error.message || "Unknown error"
         });
 
     }

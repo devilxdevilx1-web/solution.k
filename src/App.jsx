@@ -28,7 +28,8 @@ function App() {
       });
 
       if (!response.ok) {
-        throw new Error("Backend error");
+        const errorData = await response.json();
+        throw new Error(errorData.details || errorData.error || "Backend error");
       }
 
       const data = await response.json();
@@ -38,7 +39,7 @@ function App() {
     } catch (err) {
 
       console.error(err);
-      alert("Error connecting to backend AI");
+      alert(`Error: ${err.message}. Check the browser console for more details.`);
 
     }
 
