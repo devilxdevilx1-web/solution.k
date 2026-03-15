@@ -1,69 +1,58 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 dotenv.config();
 
 const app = express();
 
-// VERY IMPORTANT FOR VERCEL
 app.use(cors({
-    origin: "*",
-    methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type"]
+    origin: "*"
 }));
 
 app.use(express.json());
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// health check route
 app.get("/", (req, res) => {
-    res.send("🚀 Solution K Backend Running");
+    res.send("🚀 Solution K AI Server Running (Gemini)");
 });
 
-// MAIN AI ENDPOINT
 app.post("/study", async (req, res) => {
 
     try {
 
         const { syllabus } = req.body;
 
-        const completion = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
-            messages: [
-                {
-                    role: "system",
-                    content: "You are an AI study assistant. Summarize the syllabus, generate revision notes and predict exam questions."
-                },
-                {
-                    role: "user",
-                    content: syllabus
-                }
-            ]
+        const model = genAI.getGenerativeModel({
+            model: "gemini-1.5-flash"
         });
 
+        const result = await model.generateContent(
+            `You are an AI study assistant. Summarize this syllabus, create revision notes and exam preparation questions.
+
+      ${syllabus}`
+        );
+
+        const response = result.response.text();
+
         res.json({
-            result: completion.choices[0].message.content
+            result: response
         });
 
     } catch (error) {
 
-        console.error("AI Error:", error.response?.data || error.message || error);
+        console.error(error);
 
         res.status(500).json({
-            error: "AI processing failed",
-            details: error.message || "Unknown error"
+            error: "AI processing failed"
         });
 
     }
 
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`🚀 Solution K backend running on port ${PORT}`);
+app.listen(3000, () => {
+    console.log("🚀 Solution K backend running with Gemini");
 });
