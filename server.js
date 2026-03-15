@@ -6,53 +6,49 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 dotenv.config();
 
 const app = express();
-
-app.use(cors({
-    origin: "*"
-}));
-
+app.use(cors());
 app.use(express.json());
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.get("/", (req, res) => {
-    res.send("🚀 Solution K AI Server Running (Gemini)");
+    res.send("🚀 Solution K backend running with Gemini");
 });
 
 app.post("/study", async (req, res) => {
-
     try {
-
         const { syllabus } = req.body;
 
         const model = genAI.getGenerativeModel({
-            model: "gemini-1.5-flash-latest"
+            model: "gemini-1.5-flash"
         });
 
-        const result = await model.generateContent(
-            `You are an AI study assistant. Summarize this syllabus, create revision notes and exam preparation questions.
+        const prompt = `
+You are an AI study assistant.
 
-      ${syllabus}`
-        );
+Convert the following syllabus into:
+1. Easy explanation
+2. Key concepts
+3. Revision notes
+4. Important exam questions
 
-        const response = result.response.text();
+Syllabus:
+${syllabus}
+`;
 
-        res.json({
-            result: response
-        });
+        const result = await model.generateContent(prompt);
+        const text = result.response.text();
+
+        res.json({ result: text });
 
     } catch (error) {
-
         console.error(error);
-
-        res.status(500).json({
-            error: "AI processing failed"
-        });
-
+        res.status(500).json({ error: "AI processing failed" });
     }
-
 });
 
-app.listen(3000, () => {
-    console.log("🚀 Solution K backend running with Gemini");
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log(`🚀 Solution K backend running on port ${PORT}`);
 });
