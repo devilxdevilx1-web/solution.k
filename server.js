@@ -12,7 +12,7 @@ app.use(express.json());
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.get("/", (req, res) => {
-    res.send("🚀 Solution K backend running with Gemini");
+    res.send("🚀 Solution K backend running");
 });
 
 app.post("/study", async (req, res) => {
@@ -20,13 +20,14 @@ app.post("/study", async (req, res) => {
         const { syllabus } = req.body;
 
         const model = genAI.getGenerativeModel({
-            model: "gemini-1.5-flash-002"
+            model: "gemini-pro"
         });
 
         const prompt = `
 You are an AI study assistant.
 
-Convert the following syllabus into:
+Convert this syllabus into:
+
 1. Easy explanation
 2. Key concepts
 3. Revision notes
@@ -50,5 +51,5 @@ ${syllabus}
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-    console.log(`🚀 Solution K backend running on port ${PORT}`);
+    console.log("🚀 Solution K backend running");
 });
