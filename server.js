@@ -20,7 +20,7 @@ app.post("/study", async (req, res) => {
         const { syllabus } = req.body;
 
         const model = genAI.getGenerativeModel({
-            model: "gemini-1.5-flash"
+            model: "gemini-1.5-flash-002"
         });
 
         const prompt = `
