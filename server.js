@@ -17,28 +17,30 @@ app.get("/", (req, res) => {
 
 app.post("/study", async (req, res) => {
     try {
+
         const { syllabus } = req.body;
 
         const model = genAI.getGenerativeModel({
-            model: "gemini-pro"
+            model: "gemini-1.5-flash"
         });
 
         const prompt = `
 You are an AI study assistant.
 
-Convert this syllabus into:
+Turn the following syllabus into:
 
-1. Easy explanation
-2. Key concepts
-3. Revision notes
-4. Important exam questions
+1️⃣ Easy explanation  
+2️⃣ Key concepts  
+3️⃣ Quick revision points  
+4️⃣ Important exam questions  
 
 Syllabus:
 ${syllabus}
 `;
 
         const result = await model.generateContent(prompt);
-        const text = result.response.text();
+        const response = await result.response;
+        const text = response.text();
 
         res.json({ result: text });
 
@@ -48,8 +50,8 @@ ${syllabus}
     }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
 app.listen(PORT, () => {
-    console.log("🚀 Solution K backend running");
+    console.log(`🚀 Solution K backend running on port ${PORT}`);
 });
